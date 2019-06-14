@@ -2,16 +2,16 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 
+// multers disk storage settings
 const storage = multer.diskStorage({
-  // multers disk storage settings
   destination: (req, file, cb) => {
     cb(null, "public/images/");
   },
   filename: (req, file, cb) => {
     cb(
       null,
-      `${file.originalname.split(".")[0]}-${Date.now()}${
-        file.originalname.split(".")[1]
+      `${file.originalname.split(".")[0]}-${Date.now()}.${
+        file.originalname.split(".").pop()
       }`
     );
   }
@@ -20,8 +20,8 @@ const storage = multer.diskStorage({
 const upload = multer({
   dest: "tmp/",
   storage: storage,
-  limits: { fileSize: 3 * 1024 * 1024 },
-  fileFilter: function(req, file, cb) {
+  limits: { fileSize: 1 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
     if (!file.mimetype.includes("image/png")) {
       req.fileValidationError = "goes wrong on the mimetype...";
       // return cb(new Error("goes wrong on the mimetype"));
@@ -35,16 +35,18 @@ router
   .route("/")
   .get((req, res) => {
     res.send(
-      `<form method="POST" enctype="multipart/form-data" action="checkupload">
-    <input type="file" name="mesfichiers" accept="image/png" multiple>
-    <button> envoyer </button>
-    </form>`
+      `<form method="POST" enctype="multipart/form-data" action="check">
+      <input type="file" name="myFiles" accept="image/png" multiple>
+      <button>Send</button>
+      </form>`
     );
   })
-  .post(upload.array("mesfichiers", 3), (req, res) => {
-    // console.log(req.files);
-    if (req.fileValidationError) res.end(req.fileValidationError);
-    else res.end("Fichier(s) uploadé(s) avec succès");
+  .post(upload.array("myFiles", 3), (req, res) => {
+    console.log(req.files);
+    if (req.fileValidationError)
+      res.end(req.fileValidationError);
+    else
+      res.end("File(s) uploaded successfully");
   });
 
 module.exports = router;

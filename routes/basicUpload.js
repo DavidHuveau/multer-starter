@@ -12,7 +12,7 @@ router
     res.send(
       `<form method="POST" enctype="multipart/form-data" action="single">
       <input type="file" name="myFile" accept="image/png">
-      <button> envoyer </button>
+      <button>Send</button>
       </form>`
     );
     res.end();
@@ -33,7 +33,7 @@ router
     res.send(
       `<form method="POST" enctype="multipart/form-data" action="multiple">
       <input type="file" name="myFiles" accept="image/png" multiple>
-      <button> envoyer </button>
+      <button>Send</button>
       </form>`
     );
     res.end();
