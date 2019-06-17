@@ -11,24 +11,28 @@ const storage = multer.diskStorage({
     cb(
       null,
       `${file.originalname.split(".")[0]}-${Date.now()}.${
-        file.originalname.split(".").pop()
-      }`
+        file.originalname.split(".").pop()}`
     );
   }
 });
 
-const upload = multer({
-  dest: "tmp/",
-  storage: storage,
-  limits: { fileSize: 1 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    if (!file.mimetype.includes("image/png")) {
+const fileFilter = (req, file, cb) => {
+    // supported image file mimetypes
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/gif'];
+
+    if (!allowedMimes.includes(file.mimetype)) {
       req.fileValidationError = "goes wrong on the mimetype...";
       // return cb(new Error("goes wrong on the mimetype"));
       return cb(null, false);
     }
     cb(null, true);
-  }
+}
+
+const upload = multer({
+  dest: "tmp/",
+  storage: storage,
+  limits: { fileSize: 1 * 1024 * 1024 },
+  fileFilter: fileFilter
 });
 
 router
@@ -36,7 +40,7 @@ router
   .get((req, res) => {
     res.send(
       `<form method="POST" enctype="multipart/form-data" action="check">
-      <input type="file" name="myFiles" accept="image/png" multiple>
+      <input type="file" name="myFiles" accept="image/jpeg, image/png, image/gif" multiple>
       <button>Send</button>
       </form>`
     );
