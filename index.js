@@ -11,6 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 app.use("/", require("./routes"));
 app.use("/basic", require("./routes/basicUpload"));
 app.use("/check", require("./routes/checkUpload"));
+app.use("/resize", require("./routes/checkAndResize"));
 
 // The 404 Route (ALWAYS Keep this as the last route)
 app.use((req, res) => {
