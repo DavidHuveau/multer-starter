@@ -36,21 +36,23 @@ router
     upload.single("myFile"),
     (req, res) => {
       const { file } = req;
-      console.log(file);
+      // console.log(file);
 
       if (req.fileValidationError)
         res.end(req.fileValidationError);
       else {
         const newPath = `public/thumbnails/${uuidv4()}.png`;
         sharp(file.path)
-          .rotate()
-          .resize(200)
+          .rotate() // auto-rotated using EXIF Orientation tag
+          .resize({
+            width: 200,
+            height: 200,
+            fit: sharp.fit.cover // crop to cover both provided dimensions
+          })
           .png()
           .toFile(newPath, err => {
-            if (err)
-              res.send(err)
-            else
-              res.end("File uploaded successfully");
+            if (err) throw err;
+            res.json(newPath);
           });
       }
 
