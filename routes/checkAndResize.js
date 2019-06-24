@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const sharp = require("sharp");
-const uuidv4 = require("uuid/v4");
+const Resize = require('../Resize');
 
 const fileFilter = (req, file, cb) => {
     // supported image file mimetypes
@@ -34,28 +33,22 @@ router
   })
   .post(
     upload.single("myFile"),
-    (req, res) => {
-      const { file } = req;
+    async (req, res) => {
       // console.log(file);
+      const { file } = req;
 
       if (req.fileValidationError)
-        res.end(req.fileValidationError);
+        res.status(401).json({error: req.fileValidationError});
+      else if(!file)
+        res.status(401).json({error: 'Please provide an image'});
       else {
-        const newPath = `public/thumbnails/${uuidv4()}.png`;
-        sharp(file.path)
-          .rotate() // auto-rotated using EXIF Orientation tag
-          .resize({
-            width: 200,
-            height: 200,
-            fit: sharp.fit.cover // crop to cover both provided dimensions
-          })
-          .png()
-          .toFile(newPath, err => {
-            if (err) throw err;
-            res.json(newPath);
-          });
+        const destFolder = "public/thumbnails/";
+        const resizer = new Resize(destFolder);
+        const filename = await resizer.saveThumbnail(file.path);
+        return res.json({ name: filename });
       }
 
-    });
+    }
+  );
 
 module.exports = router;
